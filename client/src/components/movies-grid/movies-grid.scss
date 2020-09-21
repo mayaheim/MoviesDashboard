@@ -1,0 +1,6 @@
+.grid {
+    display: grid;
+    box-sizing: border-box;
+    grid-template-columns: repeat(4, minmax(270px, 1fr));
+    column-gap: 30px;
+}
