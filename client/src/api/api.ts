@@ -20,6 +20,10 @@ export const getMoviesList = (): Promise<IMovieData[]> => {
     return axios.get('http://localhost:3000/movies').then(({data}) => data);
 };
 
+export const getMoviesListBySearchTerm = (searchTerm: string): Promise<IMovieData[]> => {
+    return axios.get(`http://localhost:3000/movies?search=${searchTerm}`).then(({data}) => data);
+};
+
 export const getMovieDetails = (
     id: string
 ): Promise<IMovieData> => {

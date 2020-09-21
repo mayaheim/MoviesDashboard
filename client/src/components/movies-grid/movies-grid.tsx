@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import {getMoviesList, IMovieData} from "../../api/api";
+import {getMoviesList, IMovieData, getMoviesListBySearchTerm} from "../../api/api";
 import './movies-grid.scss';
 import {Link} from 'react-router-dom';
+import throttle from 'lodash.throttle';
 
 const MovieBox = (movie : IMovieData) => {
     const toLink = `/movie/${movie.id}`;
@@ -33,24 +34,27 @@ export const MoviesGrid = () => {
     const moviesItems = movies && movies.map((movie) =>
             <MovieBox {...movie}/>
     );
+    const delaySearch = throttle(async function(val)  {
+        const moviesList = await getMoviesListBySearchTerm(val);
+        setMovies(moviesList);
+        }, 1500, { 'leading': false });
+    const handleSearch = async (evt) => {
+        delaySearch(evt.target.value);
+    };
     return (
         <div >
+            <div>
+                <div>
+                    <input type="search"
+                           id="example-search-input2"
+                           style={{width: '20%', position: 'relative', borderRadius: '40px', paddingRight: '110px' }} onChange={handleSearch}>
+                    </input>
+                </div>
+            </div>
+
             {movies && movies.length ?
                 (
                     <div>
-                        <div>
-                            <div>
-                                <input type="search"
-                                       id="example-search-input2"
-                                       style={{width: '100%', position: 'relative', borderRadius: '40px', paddingRight: '110px' }}>
-                                </input>
-                                <button
-                                    style={{ backgroundColor: '#d1af4e', color: '#000', borderRadius: '40px', position: 'absolute', top: '1px', right: '1px'}}
-                                    type="button"> search
-                                </button>
-                            </div>
-                        </div>
-
                         <div className='grid'>{moviesItems}</div>
                     </div>
                 ): (<div>Loading</div>)
