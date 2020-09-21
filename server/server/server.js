@@ -16,7 +16,22 @@ app.use(session({secret: "Movies dashboard secret"}));
 
 app.get('/movies', (req, res) => {
     const limit = req.query.limit;
-    if (limit) {
+    const searchTerm = req.query.search;
+    if (searchTerm) {
+        console.log("11111" + searchTerm);
+        let moviesResults = movies.filter((movie) => movie.title.toLowerCase().includes(searchTerm.toLowerCase()));
+        if (!moviesResults.length) {
+            console.log("22222" + searchTerm);
+            moviesResults = movies.filter((movie) => movie.synopsis.toLowerCase().includes(searchTerm.toLowerCase()));
+            if (!moviesResults.length) {
+                if (Number(searchTerm)) {
+                    console.log("3333" + searchTerm);
+                    moviesResults = movies.filter((movie) => movie.released === searchTerm);
+                }
+            }
+        }
+        res.send(moviesResults);
+    } else if (limit) {
         const prevLimit = req.session.limit || 0;
         if ((prevLimit + limit) <= movies.length) {
             req.session[limit] = (prevLimit + limit);
@@ -27,8 +42,6 @@ app.get('/movies', (req, res) => {
     } else {
         res.send(movies);
     }
-
-
 });
 
 app.get('/movies/:id', (req, res) => res.send(movies.filter(movie => movie.id === req.params.id)));
