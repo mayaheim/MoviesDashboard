@@ -7,10 +7,10 @@ import throttle from 'lodash.throttle';
 const MovieBox = (movie : IMovieData) => {
     const toLink = `/movie/${movie.id}`;
     return (
-        <Link to={{pathname: toLink, state: { movie } }}>
-            <div key={movie.id}>
-                <img src={movie.image} alt={movie.title}/>
-                <div>title</div>
+        <Link to={{pathname: toLink, state: { movie } }} key={movie.id} className='movie-container'>
+            <div>
+                <img className='movie-image' src={movie.image} alt={movie.title}/>
+                <div className='movie-title'>{movie.title}</div>
             </div>
         </Link>
     );
@@ -41,7 +41,7 @@ export const MoviesGrid = () => {
     const handleInitial = useCallback(async (count) => {
         const moviesList = await getMoviesListBulk(count, count + 20);
         setMovies(movies => [...movies, ...moviesList]);
-    }, [getMoviesListBulk]);
+    }, []);
 
     useEffect(() => {
         handleInitial(count.current);
@@ -81,12 +81,15 @@ export const MoviesGrid = () => {
     );
 
     return (
-        <div >
-            <div>
-                <input type="search"
-                       id="example-search-input2"
-                       style={{width: '20%', position: 'relative', borderRadius: '40px', paddingRight: '110px' }} onChange={handleSearch}>
-                </input>
+        <div className='movies-grid-container'>
+            <div className='header'>
+                <div className='movie-search-box-container'>
+                    <input type="search"
+                           className='movie-search-box'
+                           onChange={handleSearch}
+                           placeholder='Search movies...'>
+                    </input>
+                </div>
             </div>
 
             {movies && movies.length ?
