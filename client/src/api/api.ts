@@ -20,6 +20,10 @@ export const getMoviesList = (): Promise<IMovieData[]> => {
     return axios.get('http://localhost:3000/movies').then(({data}) => data);
 };
 
+export const getMoviesListBulk = (start: number, end: number): Promise<IMovieData[]> => {
+    return axios.get(`http://localhost:3000/movies?start=${start}&end=${end}`).then(({data}) => data);
+};
+
 export const getMoviesListBySearchTerm = (searchTerm: string): Promise<IMovieData[]> => {
     return axios.get(`http://localhost:3000/movies?search=${searchTerm}`).then(({data}) => data);
 };

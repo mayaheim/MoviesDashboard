@@ -8,34 +8,31 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 
 const app = express();
+app.use(cookieParser());
+app.use(session({secret: "Movies dashboard secret"}));
 app.use(cors());
 app.use(logger('dev'));
 app.use(express.static(path.join(__dirname, 'dist')));
-app.use(cookieParser());
-app.use(session({secret: "Movies dashboard secret"}));
 
 app.get('/movies', (req, res) => {
-    const limit = req.query.limit;
+    const start = req.query.start;
+    const end = req.query.end;
     const searchTerm = req.query.search;
     if (searchTerm) {
-        console.log("11111" + searchTerm);
         let moviesResults = movies.filter((movie) => movie.title.toLowerCase().includes(searchTerm.toLowerCase()));
         if (!moviesResults.length) {
-            console.log("22222" + searchTerm);
             moviesResults = movies.filter((movie) => movie.synopsis.toLowerCase().includes(searchTerm.toLowerCase()));
             if (!moviesResults.length) {
                 if (Number(searchTerm)) {
-                    console.log("3333" + searchTerm);
                     moviesResults = movies.filter((movie) => movie.released === searchTerm);
                 }
             }
         }
         res.send(moviesResults);
-    } else if (limit) {
-        const prevLimit = req.session.limit || 0;
-        if ((prevLimit + limit) <= movies.length) {
-            req.session[limit] = (prevLimit + limit);
-            res.send(movies.slice(prevLimit, req.session[limit]));
+    }
+    else if (start && end) {
+        if (end <= movies.length) {
+            res.send(movies.slice(start, end));
         } else {
             res.send([]);
         }
