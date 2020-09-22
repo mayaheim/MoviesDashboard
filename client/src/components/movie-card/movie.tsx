@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {getMovieDetails} from "../../api/api";
 import { useParams } from "react-router-dom";
 import {Link} from 'react-router-dom';
+import './movie.scss';
 
 export function MovieCard(props) {
     const { id } = useParams();
@@ -21,17 +22,22 @@ export function MovieCard(props) {
     }, [id, movie]);
 
     return (
-        <div>
-            <Link to='/'>
-                <button>Back to All</button>
-            </Link>
+        <div className='movie-container'>
+            <div className='button-container'>
+                <Link to='/'>
+                    <button className='back-button'>Back to All</button>
+                </Link>
+            </div>
+
             {movie ?
                 (
-                    <div>
-                        <img src={movie.image} alt={movie.title}/>
-                        <div>{movie.title}</div>
-                        <div>{movie.released} | {movie.runtime} | {movie.rating}</div>
-                        <div>{movie.synopsis}</div>
+                    <div className='movie-details'>
+                        <img className='movie-info-image' src={movie.image} alt={movie.title}/>
+                        <div className='movie-info'>
+                            <div className='title'>{movie.title}</div>
+                            <div className='general-info'>{movie.released} | {movie.runtime} | {`${movie.rating} stars`}</div>
+                            <div className='movie-desc' dangerouslySetInnerHTML={{__html: movie.synopsis}}></div>
+                        </div>
 
                     </div>
                 ) : (<div>Loading</div>)}
