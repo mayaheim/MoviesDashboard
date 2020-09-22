@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import {Link} from 'react-router-dom';
 
 export function MovieCard(props) {
-    debugger
     const { id } = useParams();
     const movieInit: any = (props.location && props.location.state && props.location.state.movie) || undefined;
     const [movie, setMovie] = useState(movieInit);

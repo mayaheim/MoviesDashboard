@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {getMoviesListBulk, IMovieData, getMoviesListBySearchTerm} from "../../api/api";
 import './movies-grid.scss';
 import {Link} from 'react-router-dom';
@@ -18,19 +18,49 @@ const MovieBox = (movie : IMovieData) => {
 
 
 export const MoviesGrid = () => {
-    let moviesInit: any[] = [];
+    const moviesInit: any[] = [];
+    const elementInit: any = undefined;
     const moviesInPort = 20;
     const [movies, setMovies] = useState(moviesInit);
-    const [count, setCount] = useState(0);
+    const count = useRef(0);
+    const [element, setElement] = useState(elementInit);
 
-    const handleInitial = useCallback(async () => {
+    const observer = useRef(
+        new IntersectionObserver(
+            entries => {
+                const firstEntry = entries[0];
+
+                if (firstEntry.intersectionRatio > 0) {
+                    loadMore();
+                }
+            },
+            { threshold: 1 }
+        )
+    );
+
+    const handleInitial = useCallback(async (count) => {
         const moviesList = await getMoviesListBulk(count, count + 20);
         setMovies(movies => [...movies, ...moviesList]);
-    }, [count]);
+    }, [getMoviesListBulk]);
 
     useEffect(() => {
-        handleInitial();
+        handleInitial(count.current);
     }, [handleInitial]);
+
+    useEffect(() => {
+        const currentElement = element;
+        const currentObserver = observer.current;
+
+        if (currentElement) {
+            currentObserver.observe(currentElement);
+        }
+
+        return () => {
+            if (currentElement) {
+                currentObserver.unobserve(currentElement);
+            }
+        };
+    }, [element]);
 
     const delaySearch = throttle(async function(val)  {
         const moviesList = await getMoviesListBySearchTerm(val);
@@ -42,7 +72,8 @@ export const MoviesGrid = () => {
     };
 
     const loadMore = () => {
-        setCount(count + moviesInPort);
+        count.current = (count.current + moviesInPort);
+        handleInitial(count.current);
     };
 
     const moviesItems = movies && movies.map((movie) =>
@@ -66,8 +97,7 @@ export const MoviesGrid = () => {
                 ): (<div>Loading ...</div>)
             }
 
-            <div className="buttonContainer">
-                <button className="buttonStyle" onClick={loadMore}>Load More</button>
+            <div ref={setElement}>
             </div>
         </div>
 
